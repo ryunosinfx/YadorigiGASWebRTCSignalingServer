@@ -1,0 +1,29 @@
+{
+  "name": "yadorigi_gas_webrtc_signaling_server",
+  "version": "1.0.0",
+  "description": "Simple WebRTC Signaling Server On Google Apps Scripts For Yadorigi FrameWork",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryunosinfx/YadorigiGASWebRTCSignalingServer.git"
+  },
+  "keywords": [
+    "yadorigi",
+    "webrtc"
+  ],
+  "author": "ryunosinfx2 <ryunosinfxxul@gmail.com> (https://github.com/ryunosinfx)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ryunosinfx/YadorigiGASWebRTCSignalingServer/issues"
+  },
+  "homepage": "https://github.com/ryunosinfx/YadorigiGASWebRTCSignalingServer#readme",
+  "dependencies": {
+    "@google/clasp": "^2.3.0"
+  }
+}
