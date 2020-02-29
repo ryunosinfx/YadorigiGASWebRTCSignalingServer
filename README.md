@@ -8,5 +8,4 @@ https://script.google.com/macros/s/AKfycbyEIu-LGf6EuywyQnEq41Tf21tU0iB3DCDkPBygQ
 
 ## spec
 
-- Simple REST API(only POST and GET Method)
-  -
+- ## Simple REST API(only POST and GET Method)

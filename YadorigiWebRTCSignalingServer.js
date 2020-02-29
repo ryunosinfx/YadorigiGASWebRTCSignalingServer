@@ -121,7 +121,7 @@ class Service {
 	}
 }
 
-class YadorigiWebRTCSignalingServe {
+class YadorigiWebRTCSignalingServer {
 	constructor(hoge) {
 		this.name = 'YadorigiWebRTCSignalingServer';
 		this.service = new Service();
@@ -135,16 +135,16 @@ class YadorigiWebRTCSignalingServe {
 		if (group && fileName && data && hash) {
 			this.service.save(group, fileName, data, hash);
 		}
-		let output = ContentService.createTextOutput('', this);
+		let output = ContentService.createTextOutput('');
 		output.append(hash);
 		output.setMimeType(ContentService.MimeType.TEXT);
 	}
 	doGet(event) {
-		let parram = event.parameter;
-		let command = parram ? parram.command : null;
-		let fileName = parram ? parram.fileName : null;
-		let group = parram ? parram.group : null;
-		let output = ContentService.createTextOutput('', this);
+		let param = event.parameter;
+		let command = param ? param.command : null;
+		let fileName = param ? param.fileName : null;
+		let group = param ? param.group : null;
+		let output = ContentService.createTextOutput('');
 		// console.log('ServerClass doGet +' + JSON.stringify(event));
 		// console.log(event.parameter);
 		// console.log(event);
