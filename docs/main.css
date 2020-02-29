@@ -1,0 +1,28 @@
+body {
+	background-color: aliceblue;
+}
+h1 {
+	padding: 0.5em;
+	background-color: aqua;
+	border-radius: 0.5em;
+}
+div {
+	padding: 0;
+	margin: 0;
+}
+h2 {
+	border: solid blue 1px;
+	padding: 0.2em;
+}
+div.conatiner {
+}
+div.list {
+	display: flex;
+	flex: content;
+}
+div.type > h2 {
+	width: 100vw;
+}
+div.list > div {
+	width: 30vw;
+}

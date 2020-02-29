@@ -1,10 +1,3 @@
-///
-///API一覧
-// ・画像投稿
-// ・画像取得
-// ・最終更新ハッシュ取得
-// ・次の画像取得
-
 class Recode {
 	constructor(group, fileName, data, hash) {
 		if (group && typeof group === 'object' && group.length > 0) {
@@ -39,8 +32,8 @@ class Recode {
 	}
 }
 class SheetAddressor {
-	constructor(sheet) {
-		this.sheet = sheet;
+	constructor() {
+		this.sheet = SpreadsheetApp.getActiveSpreadsheet();
 		this.matrix = this.sheet.getDataRange().getValues(); //受け取ったシートのデータを二次元配列に取得
 		this.rowCount = this.matrix.length;
 	}
@@ -89,27 +82,23 @@ class SheetAddressor {
 }
 class Service {
 	constructor() {
-		this.spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-		this.accessor = new SheetAddressor(this.spreadsheet);
+		this.accessor = new SheetAddressor();
 	}
 	getLatest() {
-		// console.log('Service getLatest');
 		return this.accessor.getLastRow();
 	}
 	getNext(group, fileName) {
-		const where = [group, fileName];
-		const result = this.accessor.findRow(where);
+		const result = this.accessor.findRow([group, fileName]);
 		const index = result ? result.index : null;
 		const targetIndex = index && typeof index === 'number' ? index - 1 : 0;
 		// console.log('Service getNext' + targetIndex);
 		// console.log(targetIndex);
-		return this.accessor.getRowByIndex();
+		return this.accessor.getRowByIndex(targetIndex);
 	}
 	get(group, fileName) {
-		const where = [group, fileName];
 		// console.log('Service get where');
 		// console.log(where);
-		return this.accessor.findRow(where);
+		return this.accessor.findRow([group, fileName]);
 	}
 	save(group, fileName, data, hash) {
 		// console.log('Service save +' + { group, fileName, data, hash });
@@ -122,57 +111,57 @@ class Service {
 }
 
 class YadorigiWebRTCSignalingServer {
-	constructor(hoge) {
+	constructor() {
 		this.name = 'YadorigiWebRTCSignalingServer';
 		this.service = new Service();
 	}
 	doPost(event) {
-		let group = event.parameter.group;
-		let fileName = event.parameter.fileName;
-		let data = event.parameter.data;
-		let hash = event.parameter.hash;
+		const group = event.parameter.group;
+		const fileName = event.parameter.fileName;
+		const data = event.parameter.data;
+		const hash = event.parameter.hash;
 		// console.log('ServerClass save +' + JSON.stringify(event.parameter));
 		if (group && fileName && data && hash) {
 			this.service.save(group, fileName, data, hash);
 		}
-		let output = ContentService.createTextOutput('');
+		const output = ContentService.createTextOutput('');
 		output.append(hash);
 		output.setMimeType(ContentService.MimeType.TEXT);
 	}
 	doGet(event) {
-		let param = event.parameter;
-		let command = param ? param.command : null;
-		let fileName = param ? param.fileName : null;
-		let group = param ? param.group : null;
-		let output = ContentService.createTextOutput('');
+		const param = event.parameter;
+		const command = param ? param.command : null;
+		const fileName = param ? param.fileName : null;
+		const group = param ? param.group : null;
+		const output = ContentService.createTextOutput('');
 		// console.log('ServerClass doGet +' + JSON.stringify(event));
 		// console.log(event.parameter);
 		// console.log(event);
 		if (command && group) {
 			switch (command) {
 				case 'get':
-					let record0 = this.service.get(group, fileName);
+					const record0 = this.service.get(group, fileName);
 					// console.log('ServerClass doGet get record0:' + record0);
 					// console.log(record0);
 					output.append(record0.data);
 					output.setMimeType(ContentService.MimeType.TEXT);
 					break;
 				case 'next':
-					let record1 = this.service.getNext(group, fileName);
+					const record1 = this.service.getNext(group, fileName);
 					// console.log('ServerClass doGet next record1:' + record1);
 					// console.log(record1);
 					output.append(record1.data);
 					output.setMimeType(ContentService.MimeType.TEXT);
 					break;
 				case 'hash':
-					let record3 = this.service.getNext(group, fileName);
+					const record3 = this.service.getNext(group, fileName);
 					// console.log('ServerClass doGet hash record3:' + record3);
 					// console.log(record3);
 					output.append(record3.hash);
 					output.setMimeType(ContentService.MimeType.TEXT);
 					break;
 				case 'last':
-					let record2 = this.service.getLatest(group);
+					const record2 = this.service.getLatest(group);
 					// console.log('ServerClass doGet last record2:' + record2);
 					// console.log(record2);
 					output.append(record2 ? record2.data : '');
@@ -187,16 +176,11 @@ class YadorigiWebRTCSignalingServer {
 		output.setMimeType(ContentService.MimeType.TEXT);
 	}
 }
-
-function create(hoge) {
-	return new YadorigiWebRTCSignalingServer(hoge);
-}
+const server = new YadorigiWebRTCSignalingServer();
 
 function doPost(event) {
-	const server = new YadorigiWebRTCSignalingServer();
 	return server.doPost(event);
 }
 function doGet(event) {
-	let server = new YadorigiWebRTCSignalingServer();
 	return server.doGet(event);
 }

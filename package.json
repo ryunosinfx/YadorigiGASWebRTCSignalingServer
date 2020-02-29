@@ -7,7 +7,8 @@
 		"test": "test"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "webpack-dev-server"
 	},
 	"repository": {
 		"type": "git",
@@ -25,6 +26,9 @@
 	"homepage": "https://github.com/ryunosinfx/YadorigiGASWebRTCSignalingServer#readme",
 	"dependencies": {},
 	"devDependencies": {
-		"@google/clasp": "^2.3.0"
+		"@google/clasp": "^2.3.0",
+		"webpack": "^4.41.6",
+		"webpack-cli": "^3.3.11",
+		"webpack-dev-server": "^3.10.3"
 	}
 }

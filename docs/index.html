@@ -3,9 +3,77 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=480,initial-scale=1.5" />
-		<title>yadorigi</title>
+		<title>Test for YadorigiGASWebRTCSignalingServer</title>
 		<link rel="stylesheet" href="main.css" />
-		<script src="./test.js"></script>
 	</head>
-	<body></body>
+	<body>
+		<div class="header"></div>
+		<div class="main">
+			<h1>TestPage for YadorigiGASWebRTCSignalingServer</h1>
+			<div class="conatiner">
+				<div class="type">
+					<h2>Get API</h2>
+					<div class="list">
+						<div class="get">
+							<h3>get : Get target record</h3>
+							<ul>
+								<li>command:get<input type="hidden" value="get" /></li>
+								<li>group:<input /></li>
+								<li>fileName:<input /></li>
+								<li><button class="get">Call</button></li>
+							</ul>
+							<div class="result"></div>
+						</div>
+						<div class="get">
+							<h3>next : Get next one record form target record.</h3>
+							<ul>
+								<li>command:next<input type="hidden" value="next" /></li>
+								<li>group:<input /></li>
+								<li>fileName:<input /></li>
+								<li><button class="next">Call</button></li>
+							</ul>
+							<div class="result"></div>
+						</div>
+						<div class="get">
+							<h3>hash : Get target record hash which recorded with same time.</h3>
+							<ul>
+								<li>command:hash<input type="hidden" value="hash" /></li>
+								<li>group:<input /></li>
+								<li>fileName:<input /></li>
+								<li><button class="hash">Call</button></li>
+							</ul>
+							<div class="result"></div>
+						</div>
+						<div class="get">
+							<h3>last : Get last record</h3>
+							<ul>
+								<li>command:last<input type="hidden" value="last" /></li>
+								<li>group:<input /></li>
+								<li><button class="last"></button>Call</button></li>
+							</ul>
+							<div class="result"></div>
+						</div>
+					</div>
+				</div>
+				<div class="type">
+					<h2>POST API</h2>
+					<div class="list">
+						<div class="post">
+							<ul>
+								<li>command:get<input type="hidden" value="get" /></li>
+								<li>group:<input /></li>
+								<li>fileName:<input /></li>
+								<li>hash:<input /></li>
+								<li>data:<input /></li>
+								<li><button class="last">Call</button></li>
+							</ul>
+							<div class="result"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="footer"></div>
+		<script src="./test.js"></script>
+	</body>
 </html>
