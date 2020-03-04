@@ -116,6 +116,9 @@ class YadorigiWebRTCSignalingServer {
 		this.service = new Service();
 	}
 	doPost(event) {
+		if (!event || event.parameter) {
+			return ContentService.createTextOutput(JSON.stringify(event));
+		}
 		const group = event.parameter.group;
 		const fileName = event.parameter.fileName;
 		const data = event.parameter.data;
@@ -129,6 +132,9 @@ class YadorigiWebRTCSignalingServer {
 		output.setMimeType(ContentService.MimeType.TEXT);
 	}
 	doGet(event) {
+		if (!event || event.parameter) {
+			return ContentService.createTextOutput(JSON.stringify(event));
+		}
 		const param = event.parameter;
 		const command = param ? param.command : null;
 		const fileName = param ? param.fileName : null;
@@ -179,8 +185,18 @@ class YadorigiWebRTCSignalingServer {
 const server = new YadorigiWebRTCSignalingServer();
 
 function doPost(event) {
-	return server.doPost(event);
+	try {
+		return server.doPost(event);
+	} catch (e) {
+		console.warn(e);
+		return ContentService.createTextOutput(e + '');
+	}
 }
 function doGet(event) {
-	return server.doGet(event);
+	try {
+		return server.doGet(event);
+	} catch (e) {
+		console.warn(e);
+		return ContentService.createTextOutput(e + '');
+	}
 }

@@ -26,3 +26,6 @@ div.type > h2 {
 div.list > div {
 	width: 30vw;
 }
+div.result {
+	white-space: pre;
+}

@@ -11,45 +11,48 @@
 		<div class="main">
 			<h1>TestPage for YadorigiGASWebRTCSignalingServer</h1>
 			<div class="conatiner">
+				<div class="target">
+					targe GAS url: <input id="targetUrl" value="https://script.google.com/macros/s/AKfycbyEIu-LGf6EuywyQnEq41Tf21tU0iB3DCDkPBygQkukJEVe3Zo/exec"/>
+				</div>
 				<div class="type">
 					<h2>Get API</h2>
 					<div class="list">
 						<div class="get">
 							<h3>get : Get target record</h3>
 							<ul>
-								<li>command:get<input type="hidden" value="get" /></li>
-								<li>group:<input /></li>
-								<li>fileName:<input /></li>
-								<li><button class="get">Call</button></li>
+								<li>command:get<input name="command" type="hidden" value="get" /></li>
+								<li>group:<input name="group" /></li>
+								<li>fileName:<input name="fileName"  /></li>
+								<li><button class="getButton">Call</button></li>
 							</ul>
 							<div class="result"></div>
 						</div>
 						<div class="get">
 							<h3>next : Get next one record form target record.</h3>
 							<ul>
-								<li>command:next<input type="hidden" value="next" /></li>
-								<li>group:<input /></li>
-								<li>fileName:<input /></li>
-								<li><button class="next">Call</button></li>
+								<li>command:next<input name="command" type="hidden" value="next" /></li>
+								<li>group:<input name="group" /></li>
+								<li>fileName:<input name="fileName" /></li>
+								<li><button class="nextButton">Call</button></li>
 							</ul>
 							<div class="result"></div>
 						</div>
 						<div class="get">
 							<h3>hash : Get target record hash which recorded with same time.</h3>
 							<ul>
-								<li>command:hash<input type="hidden" value="hash" /></li>
-								<li>group:<input /></li>
-								<li>fileName:<input /></li>
-								<li><button class="hash">Call</button></li>
+								<li>command:hash<input  name="command" type="hidden" value="hash" /></li>
+								<li>group:<input  name="group" /></li>
+								<li>fileName:<input  name="fileName" /></li>
+								<li><button class="hashButton">Call</button></li>
 							</ul>
 							<div class="result"></div>
 						</div>
 						<div class="get">
 							<h3>last : Get last record</h3>
 							<ul>
-								<li>command:last<input type="hidden" value="last" /></li>
-								<li>group:<input /></li>
-								<li><button class="last"></button>Call</button></li>
+								<li>command:last<input name="command" type="hidden" value="last" /></li>
+								<li>group:<input name="group" /></li>
+								<li><button class="lastButton"></button>Call</button></li>
 							</ul>
 							<div class="result"></div>
 						</div>
@@ -60,12 +63,12 @@
 					<div class="list">
 						<div class="post">
 							<ul>
-								<li>command:get<input type="hidden" value="get" /></li>
-								<li>group:<input /></li>
-								<li>fileName:<input /></li>
-								<li>hash:<input /></li>
-								<li>data:<input /></li>
-								<li><button class="last">Call</button></li>
+								<li>command:post<input name="command" type="hidden" value="post" /></li>
+								<li>group:<input name="group" /></li>
+								<li>fileName:<input name="fileName" /></li>
+								<li>hash:<input name="hash" /></li>
+								<li>data:<input name="data" /></li>
+								<li><button class="postButton">Call</button></li>
 							</ul>
 							<div class="result"></div>
 						</div>
