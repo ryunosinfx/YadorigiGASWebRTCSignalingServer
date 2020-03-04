@@ -1,3 +1,5 @@
 node_modules/
 docs/
-.git/
+**/**
+!Y*.js
+!appsscript.json
