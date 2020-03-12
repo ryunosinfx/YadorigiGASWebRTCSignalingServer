@@ -12,6 +12,8 @@ class Test {
 		this.setEventListern('getButton');
 		this.setEventListern('nextButton');
 		this.setEventListern('hashButton');
+		this.setEventListern('lastButton');
+		this.setEventListern('planeButton');
 		this.setEventListern('postButton');
 	}
 	setEventListern(className, eventName = 'click') {
@@ -38,12 +40,13 @@ class Test {
 						console.log(child.tagName);
 						if (child.tagName === 'INPUT') {
 							const name = child.getAttribute('name');
-							const value = child.getAttribute('value');
+							const value = child.value;
 							params[name] = value;
 						}
 					}
 				}
 			}
+			console.log(params);
 			const superParent = parent.parentNode;
 			const result = superParent.getElementsByClassName('result');
 			const ResultDom = result && result[0] ? result[0] : null;
@@ -92,7 +95,12 @@ class Fetcher {
 			method: isPost ? 'POST' : 'GET',
 			mode: isCORS ? 'cors' : 'no-cors',
 			cache: 'no-cache',
-			credentials: 'same-origin'
+			credentials: 'omit',
+			redirect: 'follow',
+			referrer: 'no-referrer',
+			headers: {
+				'Content-Type': contentType
+			}
 		};
 		const isObj = typeof data === 'object';
 		if (isPost) {
@@ -112,21 +120,21 @@ class Fetcher {
 			'Sec-Fetch-Dest': 'document',
 			'Sec-Fetch-Mode': 'cors'
 		});
-		requestData.headers = myHeaders;
 		console.log(path);
 		console.log(requestData);
+		// requestData.headers = myHeaders;
 		const res = await fetch(path, requestData);
 		return res;
 	}
-	async getBlob(path, data = {}, isPost = false, contentType = 'application/json', isCORS = false) {
-		const res = await this.exec(path, data, isPost, contentType, isCORS);
-		return await res.blob();
-	}
-	async getJson(path, data = {}, isPost = false, contentType = 'application/json', isCORS = false) {
-		const res = await this.exec(path, data, isPost, contentType, isCORS);
-		return await res.json();
-	}
-	async getTextCors(path, data = {}, isPost = false, contentType = 'application/x-www-form-urlencoded') {
+	// async getBlob(path, data = {}, isPost = false, contentType = 'application/json', isCORS = false) {
+	// 	const res = await this.exec(path, data, isPost, contentType, isCORS);
+	// 	return await res.blob();
+	// }
+	// async getJson(path, data = {}, isPost = false, contentType = 'application/json', isCORS = false) {
+	// 	const res = await this.exec(path, data, isPost, contentType, isCORS);
+	// 	return await res.json();
+	// }
+	async getTextCors(path, data = {}, isPost = false, contentType = 'application/x-www-form-urlencoded; charset=utf-8') {
 		return await this.getText(path, data, isPost, contentType, true);
 	}
 	async getText(path, data = {}, isPost = false, contentType = 'application/json', isCORS = false) {

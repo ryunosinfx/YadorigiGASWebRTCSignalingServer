@@ -1,3 +1,4 @@
+const regex = /[^-_\.0-9a-zA-Z]+/g;
 class Recode {
 	constructor(group, fileName, data, hash) {
 		if (group && typeof group === 'object' && group.length > 0) {
@@ -49,8 +50,14 @@ class SheetAddressor {
 		this.sheet.deleteRows(index, 1);
 	}
 	findRow(where) {
+		console.log('Service get where');
+		console.log(where);
+		const current = Date.now();
 		const len = this.matrix.length;
 		const whereCount = where.length;
+		const scavengableList = [];
+		let resultRow = null;
+		let resultRowIndex = -1;
 		for (let i = len - 1; i > -1; i--) {
 			//SearchFromeEnd
 			const row = this.matrix[i];
@@ -59,25 +66,40 @@ class SheetAddressor {
 			for (let j = 0; j < colsCount; j++) {
 				const colValue = row[j];
 				const condition = where[j];
-				// console.log('SheetAddressor colValue:' + colValue + '/condition:' + condition + '/matchCount:' + matchCount + '/whereCount:' + whereCount + '/j:' + j);
+				console.log('SheetAddressor colValue:' + colValue + '/condition:' + condition + '/matchCount:' + matchCount + '/whereCount:' + whereCount + '/j:' + j);
 				if ((whereCount > j && condition && condition === colValue) || (whereCount > j && !condition)) {
 					matchCount++;
 				}
 			}
 			if (matchCount === whereCount) {
-				// console.log('SheetAddressor findRow row' + typeof row + '/' + Array.isArray(row));
-				// console.log(row);
-				return new Recode(row, i);
+				console.log('SheetAddressor findRow row' + typeof row + '/' + Array.isArray(row));
+				console.log(row);
+				resultRow = row;
+				resultRowIndex = i;
+			}
+			const createTime = (row[4] + '') * 1;
+			if (!isNaN(createTime) && createTime < current) {
+				console.log('createTime:' + createTime + '/i:' + i);
+				scavengableList.push(i);
 			}
 		}
-		// console.log('SheetAddressor Not findRow row');
+		const scvlen = scavengableList.length;
+		for (let i = 0; i < scvlen; i++) {
+			const index = scavengableList.pop() + 1;
+			console.log('index:' + index + '/i:' + i);
+			this.deleteRow(index);
+		}
+		if (resultRow) {
+			return new Recode(resultRow, resultRowIndex);
+		}
+		console.log('SheetAddressor Not findRow row');
 		return null;
 	}
 	getRowByIndex(index) {
 		if ((index !== 0 && index < 0) || index >= this.rowCount) {
 			return null;
 		}
-		return new Recode(this.matrix[lastRowIndex]);
+		return new Recode(this.matrix[index]);
 	}
 }
 class Service {
@@ -96,8 +118,8 @@ class Service {
 		return this.accessor.getRowByIndex(targetIndex);
 	}
 	get(group, fileName) {
-		// console.log('Service get where');
-		// console.log(where);
+		console.log('Service get fileName');
+		console.log(fileName);
 		return this.accessor.findRow([group, fileName]);
 	}
 	save(group, fileName, data, hash) {
@@ -106,7 +128,13 @@ class Service {
 		if (!group || !fileName || !data || !hash) {
 			return;
 		}
-		this.accessor.addRow(group, fileName, data, hash);
+		this.accessor.addRow(this.reap(group, 128), this.reap(fileName, 128), this.reap(data, 10240), this.reap(hash, 90));
+	}
+	reap(value, max) {
+		return (value + '')
+			.split(regex)
+			.join('')
+			.substring(0, max);
 	}
 }
 
@@ -116,7 +144,7 @@ class YadorigiWebRTCSignalingServer {
 		this.service = new Service();
 	}
 	doPost(event) {
-		if (!event || event.parameter) {
+		if (!event || !event.parameter) {
 			return ContentService.createTextOutput(JSON.stringify(event));
 		}
 		const group = event.parameter.group;
@@ -132,54 +160,44 @@ class YadorigiWebRTCSignalingServer {
 		output.setMimeType(ContentService.MimeType.TEXT);
 	}
 	doGet(event) {
-		if (!event || event.parameter) {
+		if (!event || !event.parameter) {
 			return ContentService.createTextOutput(JSON.stringify(event));
 		}
 		const param = event.parameter;
 		const command = param ? param.command : null;
 		const fileName = param ? param.fileName : null;
 		const group = param ? param.group : null;
-		const output = ContentService.createTextOutput('');
-		// console.log('ServerClass doGet +' + JSON.stringify(event));
-		// console.log(event.parameter);
-		// console.log(event);
+		console.log('ServerClass doGet +' + JSON.stringify(event));
+		console.log(event.parameter);
+		console.log(event);
 		if (command && group) {
 			switch (command) {
 				case 'get':
-					const record0 = this.service.get(group, fileName);
-					// console.log('ServerClass doGet get record0:' + record0);
-					// console.log(record0);
-					output.append(record0.data);
-					output.setMimeType(ContentService.MimeType.TEXT);
-					break;
+					console.log('command:' + command);
+					return this.res(this.service.get(group, fileName), 'data');
 				case 'next':
-					const record1 = this.service.getNext(group, fileName);
-					// console.log('ServerClass doGet next record1:' + record1);
-					// console.log(record1);
-					output.append(record1.data);
-					output.setMimeType(ContentService.MimeType.TEXT);
-					break;
+					console.log('command:' + command);
+					return this.res(this.service.getNext(group, fileName), 'data');
 				case 'hash':
-					const record3 = this.service.getNext(group, fileName);
-					// console.log('ServerClass doGet hash record3:' + record3);
-					// console.log(record3);
-					output.append(record3.hash);
-					output.setMimeType(ContentService.MimeType.TEXT);
-					break;
+					console.log('command:' + command);
+					return this.res(this.service.getNext(group, fileName), 'hash');
 				case 'last':
-					const record2 = this.service.getLatest(group);
-					// console.log('ServerClass doGet last record2:' + record2);
-					// console.log(record2);
-					output.append(record2 ? record2.data : '');
-					output.setMimeType(ContentService.MimeType.TEXT);
-					break;
+					console.log('command:' + command);
+					return this.res(this.service.getLatest(group), 'data');
 				default:
 					console.log('Sorry, we are out of ' + command + '.');
 			}
 			return;
 		}
+		const output = ContentService.createTextOutput('');
 		output.append('');
 		output.setMimeType(ContentService.MimeType.TEXT);
+	}
+	res(record, key) {
+		const output = ContentService.createTextOutput('');
+		output.append(record && record[key] && record[key] !== 0 ? record[key] : '');
+		output.setMimeType(ContentService.MimeType.TEXT);
+		return output;
 	}
 }
 const server = new YadorigiWebRTCSignalingServer();
@@ -194,7 +212,7 @@ function doPost(event) {
 }
 function doGet(event) {
 	try {
-		return server.doGet(event);
+		return server.doGet(event ? event : { parameter: { command: 'get', group: 'a', fileName: 'aaa' } });
 	} catch (e) {
 		console.warn(e);
 		return ContentService.createTextOutput(e + '');
