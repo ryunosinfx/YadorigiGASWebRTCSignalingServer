@@ -43,11 +43,11 @@ class SheetAddressor {
 		this.sheet.appendRow(record.toArray());
 	}
 	getLastRow() {
-		let lastRowIndex = this.sheet.getDataRange().getLastRow(); //対象となるシートの最終行を取得
+		const lastRowIndex = this.sheet.getDataRange().getLastRow(); //対象となるシートの最終行を取得
 		return new Recode(this.matrix[lastRowIndex]);
 	}
 	deleteRow(index) {
-		this.sheet.deleteRows(index, 1);
+		return this.sheet.deleteRows(index, 1);
 	}
 	findRow(where) {
 		console.log('Service get where');
@@ -89,11 +89,7 @@ class SheetAddressor {
 			console.log('index:' + index + '/i:' + i);
 			this.deleteRow(index);
 		}
-		if (resultRow) {
-			return new Recode(resultRow, resultRowIndex);
-		}
-		console.log('SheetAddressor Not findRow row');
-		return null;
+		return resultRow ? new Recode(resultRow, resultRowIndex) : null;
 	}
 	getRowByIndex(index) {
 		if ((index !== 0 && index < 0) || index >= this.rowCount) {
@@ -140,33 +136,15 @@ class Service {
 
 class YadorigiWebRTCSignalingServer {
 	constructor() {
-		this.name = 'YadorigiWebRTCSignalingServer';
 		this.service = new Service();
 	}
 	doPost(event) {
-		if (!event || !event.parameter) {
-			return ContentService.createTextOutput(JSON.stringify(event));
-		}
-		const group = event.parameter.group;
-		const fileName = event.parameter.fileName;
-		const data = event.parameter.data;
-		const hash = event.parameter.hash;
-		// console.log('ServerClass save +' + JSON.stringify(event.parameter));
-		if (group && fileName && data && hash) {
-			this.service.save(group, fileName, data, hash);
-		}
-		const output = ContentService.createTextOutput('');
-		output.append(hash);
-		output.setMimeType(ContentService.MimeType.TEXT);
+		const { group, fileName, data, hash, command } = this.parse(event);
+		this.service.save(group, fileName, data, hash);
+		return this.res('{hash:' + hash + '}');
 	}
 	doGet(event) {
-		if (!event || !event.parameter) {
-			return ContentService.createTextOutput(JSON.stringify(event));
-		}
-		const param = event.parameter;
-		const command = param ? param.command : null;
-		const fileName = param ? param.fileName : null;
-		const group = param ? param.group : null;
+		const { group, fileName, data, hash, command } = this.parse(event);
 		console.log('ServerClass doGet +' + JSON.stringify(event));
 		console.log(event.parameter);
 		console.log(event);
@@ -187,15 +165,18 @@ class YadorigiWebRTCSignalingServer {
 				default:
 					console.log('Sorry, we are out of ' + command + '.');
 			}
-			return;
 		}
-		const output = ContentService.createTextOutput('');
-		output.append('');
-		output.setMimeType(ContentService.MimeType.TEXT);
+		return this.res('{msg:"no data!"}');
+	}
+	parse(event) {
+		if (!event || !event.parameter) {
+			return { group: null, fileName: null, data: null, hash: null, command: null };
+		}
+		return { group: event.parameter.group, fileName: event.parameter.fileName, data: event.parameter.data, hash: event.parameter.hash, command: event.parameter.command };
 	}
 	res(record, key) {
 		const output = ContentService.createTextOutput('');
-		output.append(record && record[key] && record[key] !== 0 ? record[key] : '');
+		output.append(record && record[key] && record[key] !== 0 ? record[key] : record + '');
 		output.setMimeType(ContentService.MimeType.TEXT);
 		return output;
 	}

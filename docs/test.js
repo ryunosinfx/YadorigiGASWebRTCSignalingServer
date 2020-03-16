@@ -51,17 +51,25 @@ class Test {
 			const result = superParent.getElementsByClassName('result');
 			const ResultDom = result && result[0] ? result[0] : null;
 			if (params.command === 'post') {
-				const result = await this.fetcher.postAsSubmit(this.url, params, true);
-				ResultDom.textContent = result;
+				ResultDom.textContent = await this.post(params);
 			} else {
 				console.log(params);
 				const result = await this.fetcher.getTextCors(this.url, params);
-				ResultDom.textContent = result;
+				ResultDom.textContent = await this.get(params);
 			}
 		};
 	}
+	async post(params) {
+		return await this.fetcher.postAsSubmit(this.url, params, true);
+	}
+	async get(params) {
+		return await this.fetcher.getTextCors(this.url, params);
+	}
+
 	call() {}
+	doTest() {}
 }
+
 class UrlUtil {
 	constructor() {}
 
