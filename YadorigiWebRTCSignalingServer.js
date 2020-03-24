@@ -41,6 +41,7 @@ class SheetAddressor {
 	addRow(group, fileName, data, hash) {
 		const record = new Recode(group, fileName, data, hash);
 		this.sheet.appendRow(record.toArray());
+		this.matrix = this.sheet.getDataRange().getValues(); //受け取ったシートのデータを二次元配列に取得
 	}
 	getLastRow() {
 		const lastRowIndex = this.sheet.getDataRange().getLastRow(); //対象となるシートの最終行を取得
@@ -62,7 +63,7 @@ class SheetAddressor {
 			//SearchFromeEnd
 			const row = this.matrix[i];
 			const colsCount = row.length;
-			const matchCount = 0;
+			let matchCount = 0;
 			for (let j = 0; j < colsCount; j++) {
 				const colValue = row[j];
 				const condition = where[j];
@@ -109,18 +110,17 @@ class Service {
 		const result = this.accessor.findRow([group, fileName]);
 		const index = result ? result.index : null;
 		const targetIndex = index && typeof index === 'number' ? index - 1 : 0;
-		// console.log('Service getNext' + targetIndex);
-		// console.log(targetIndex);
 		return this.accessor.getRowByIndex(targetIndex);
 	}
 	get(group, fileName) {
-		console.log('Service get fileName');
-		console.log(fileName);
 		return this.accessor.findRow([group, fileName]);
 	}
+	hash(group, fileName) {
+		const result = this.accessor.findRow([group, fileName]);
+		const hash = result ? result.hash : null;
+		return hash;
+	}
 	save(group, fileName, data, hash) {
-		// console.log('Service save +' + { group, fileName, data, hash });
-		// console.log('Service save');
 		if (!group || !fileName || !data || !hash) {
 			return;
 		}
@@ -158,7 +158,7 @@ class YadorigiWebRTCSignalingServer {
 					return this.res(this.service.getNext(group, fileName), 'data');
 				case 'hash':
 					console.log('command:' + command);
-					return this.res(this.service.getNext(group, fileName), 'hash');
+					return this.res(this.service.hash(group, fileName), 'hash');
 				case 'last':
 					console.log('command:' + command);
 					return this.res(this.service.getLatest(group), 'data');

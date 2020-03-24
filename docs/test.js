@@ -1,12 +1,48 @@
+const c25 = 'abcdefghijklmnopqrstuvwxy';
+const c100 = c25 + c25 + c25 + c25;
+const c125 = c100 + c25;
+const a10k = [];
+for (let i = 0; i < 100; i++) {
+	a10k.push(c100);
+}
+const c10k = a10k.join('');
 class Test {
 	constructor() {
 		this.fetcher = new Fetcher();
 		const urlInput = document.getElementById('targetUrl');
 		this.url = urlInput.value;
-		alert(this.url);
+		console.log(this.url);
 	}
-	exec() {
-		console.log('test!');
+	async doTestExec(event, logger) {
+		const gropeNameLimit = 'grp' + c125;
+		const fileNameLimit = 'fil' + c125;
+		const fileNameLimit1 = 'fi1' + c125;
+		const fileNameLimit2 = 'fi2' + c125;
+		const fileNameLimit3 = 'fi3' + c125;
+		const hashLimit = 'has' + c125;
+		const dataLimit = '123' + c10k;
+		const gropeNameOrver = 'grop' + c125;
+		const fileNameOrver = 'file' + c125;
+		const hashOrver = 'hash' + c125;
+		const dataOrver = '123' + c10k;
+		await this.getLogA(logger, '', '', '', '', '');
+		await this.postLogA(logger, 'a', 'a', 'ax.a', 'aa', 'aaaa');
+		await this.postLogA(logger, 'a', 'a', 'aa1.a', 'aaa1', 'aa1aaaaaaaaaaaa');
+		await this.postLogA(logger, 'a', 'a', 'aa2.a', 'aaa2', 'aa2aaaaaaaaaaaa');
+		await this.postLogA(logger, 'a', 'a', 'aa3.a', 'aaa3', 'aa3aaaaaaaaaaaa');
+		await this.postLogA(logger, 'a', gropeNameLimit, fileNameLimit, hashLimit, dataLimit);
+		await this.postLogA(logger, 'a', gropeNameOrver, fileNameLimit1, hashLimit, dataLimit);
+		await this.postLogA(logger, 'a', gropeNameLimit, fileNameOrver, hashLimit, dataLimit);
+		await this.postLogA(logger, 'a', gropeNameLimit, fileNameLimit2, hashOrver, dataLimit);
+		await this.postLogA(logger, 'a', gropeNameLimit, fileNameLimit3, hashLimit, dataOrver);
+		await this.getLogA(logger, 'b', 'b', 'b', 'b', 'b');
+		await this.getLogA(logger, 'get', 'b', 'b', 'b', 'b');
+		await this.getLogA(logger, 'get', 'a', 'b', 'b', 'b');
+		await this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit, '', '');
+		await this.getLogA(logger, 'last', gropeNameLimit, '', '', '');
+		await this.getLogA(logger, 'hash', gropeNameLimit, 'aa2.a', '', '');
+		await this.getLogA(logger, 'next', 'a', 'aa2.a', '', '');
+		await this.getLogA(logger, '', '', '', '', '');
 	}
 	init() {
 		this.setEventListern('getButton');
@@ -15,21 +51,27 @@ class Test {
 		this.setEventListern('lastButton');
 		this.setEventListern('planeButton');
 		this.setEventListern('postButton');
+		this.setEventListern('testButton', 'click', this.doTest);
 	}
-	setEventListern(className, eventName = 'click') {
+	setEventListern(className, eventName = 'click', funcSeed) {
 		console.log('aaa');
 		const elns = document.getElementsByClassName(className);
 		if (elns && elns[0]) {
 			console.log('aaa');
 			const target = elns[0];
-			const eventListener = this.creatEventListner(target);
+			const eventListener = this.creatEventListner(target, funcSeed);
 			target.addEventListener(eventName, eventListener);
 		}
 	}
-	creatEventListner(targetElm) {
+	creatEventListner(targetElm, funcSeed) {
+		const parent = targetElm.parentNode.parentNode;
+		const superParent = parent.parentNode;
+		const result = superParent.getElementsByClassName('result');
+		const ResultDom = result && result[0] ? result[0] : null;
+		const logger = new Logger(ResultDom);
+		const func = funcSeed ? funcSeed(this, logger) : null;
 		return async event => {
 			console.log(targetElm);
-			const parent = targetElm.parentNode.parentNode;
 			const params = {};
 			for (let k = 0; k < parent.children.length; k++) {
 				const childLi = parent.children[k];
@@ -47,15 +89,15 @@ class Test {
 				}
 			}
 			console.log(params);
-			const superParent = parent.parentNode;
-			const result = superParent.getElementsByClassName('result');
-			const ResultDom = result && result[0] ? result[0] : null;
+			if (func) {
+				func(event);
+				return;
+			}
 			if (params.command === 'post') {
-				ResultDom.textContent = await this.post(params);
+				await this.postLog(logger, params);
 			} else {
 				console.log(params);
-				const result = await this.fetcher.getTextCors(this.url, params);
-				ResultDom.textContent = await this.get(params);
+				await this.getLog(logger, params);
 			}
 		};
 	}
@@ -65,9 +107,58 @@ class Test {
 	async get(params) {
 		return await this.fetcher.getTextCors(this.url, params);
 	}
-
-	call() {}
-	doTest() {}
+	async postLog(logger, params) {
+		return logger.add(await this.post(params));
+	}
+	async getLog(logger, params) {
+		return logger.add(await this.get(params));
+	}
+	async postLogA(logger, command, group, fileName, hash, dataString) {
+		const params = this.createData(command, group, fileName, hash, dataString);
+		return logger.add('post req:' + JSON.stringify(params) + '/res:' + (await this.post(params)));
+	}
+	async getLogA(logger, command, group, fileName, hash, dataString) {
+		const params = this.createData(command, group, fileName, hash, dataString);
+		return logger.add('get req:' + JSON.stringify(params) + '/res:' + (await this.get(params)));
+	}
+	doTest(self, logger) {
+		return event => {
+			if (confirm('なーん' + event)) {
+				self.doTestExec(event, logger);
+			}
+		};
+	}
+	createData(command, group, fileName, hash, dataString) {
+		const data = {};
+		if (command) {
+			data.command = command;
+		}
+		if (group) {
+			data.group = group;
+		}
+		if (fileName) {
+			data.fileName = fileName;
+		}
+		if (hash) {
+			data.hash = hash;
+		}
+		if (dataString) {
+			data.data = dataString;
+		}
+		return data;
+	}
+}
+class Logger {
+	constructor(domObj) {
+		this.domObj = domObj;
+		this.domObj.style.whiteSpace = 'pre';
+	}
+	add(msg) {
+		const current = this.domObj.textContent;
+		console.log(msg);
+		this.domObj.textContent = current + '\n' + msg;
+		return msg;
+	}
 }
 
 class UrlUtil {
@@ -121,18 +212,9 @@ class Fetcher {
 		} else {
 			path += '?q=' + encodeURIComponent(data);
 		}
-
-		const myHeaders = new Headers({
-			'Content-Type': contentType,
-			'Content-Length': requestData.body ? requestData.body.length.toString() : '0',
-			'Sec-Fetch-Dest': 'document',
-			'Sec-Fetch-Mode': 'cors'
-		});
 		console.log(path);
 		console.log(requestData);
-		// requestData.headers = myHeaders;
-		const res = await fetch(path, requestData);
-		return res;
+		return await fetch(path, requestData);
 	}
 	// async getBlob(path, data = {}, isPost = false, contentType = 'application/json', isCORS = false) {
 	// 	const res = await this.exec(path, data, isPost, contentType, isCORS);
