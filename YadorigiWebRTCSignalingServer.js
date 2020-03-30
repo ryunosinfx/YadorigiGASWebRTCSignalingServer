@@ -1,4 +1,5 @@
 const regex = /[^-_\.0-9a-zA-Z]+/g;
+const duration = 1000 * 60 * 10;
 class Recode {
 	constructor(group, fileName, data, hash) {
 		if (group && typeof group === 'object' && group.length > 0) {
@@ -36,7 +37,6 @@ class SheetAddressor {
 	constructor() {
 		this.sheet = SpreadsheetApp.getActiveSpreadsheet();
 		this.matrix = this.sheet.getDataRange().getValues(); //受け取ったシートのデータを二次元配列に取得
-		this.rowCount = this.matrix.length;
 	}
 	addRow(group, fileName, data, hash) {
 		const record = new Recode(group, fileName, data, hash);
@@ -51,9 +51,9 @@ class SheetAddressor {
 		return this.sheet.deleteRows(index, 1);
 	}
 	findRow(where) {
-		console.log('Service get where');
-		console.log(where);
-		const current = Date.now();
+		// console.log('Service get where');
+		// console.log(where);
+		const current = Date.now() - duration;
 		const len = this.matrix.length;
 		const whereCount = where.length;
 		const scavengableList = [];
@@ -67,10 +67,8 @@ class SheetAddressor {
 			for (let j = 0; j < colsCount; j++) {
 				const colValue = row[j];
 				const condition = where[j];
-				console.log('SheetAddressor colValue:' + colValue + '/condition:' + condition + '/matchCount:' + matchCount + '/whereCount:' + whereCount + '/j:' + j);
-				if ((whereCount > j && condition && condition === colValue) || (whereCount > j && !condition)) {
-					matchCount++;
-				}
+				// console.log('SheetAddressor colValue:' + colValue + '/condition:' + condition + '/matchCount:' + matchCount + '/whereCount:' + whereCount + '/j:' + j);
+				matchCount += (whereCount > j && condition && condition === colValue) || (whereCount > j && !condition) ? 1 : 0;
 			}
 			if (matchCount === whereCount) {
 				console.log('SheetAddressor findRow row' + typeof row + '/' + Array.isArray(row));
@@ -80,20 +78,20 @@ class SheetAddressor {
 			}
 			const createTime = (row[4] + '') * 1;
 			if (!isNaN(createTime) && createTime < current) {
-				console.log('createTime:' + createTime + '/i:' + i);
+				// console.log('createTime:' + createTime + '/i:' + i);
 				scavengableList.push(i);
 			}
 		}
 		const scvlen = scavengableList.length;
 		for (let i = 0; i < scvlen; i++) {
 			const index = scavengableList.pop() + 1;
-			console.log('index:' + index + '/i:' + i);
+			// console.log('index:' + index + '/i:' + i);
 			this.deleteRow(index);
 		}
 		return resultRow ? new Recode(resultRow, resultRowIndex) : null;
 	}
 	getRowByIndex(index) {
-		if ((index !== 0 && index < 0) || index >= this.rowCount) {
+		if ((index !== 0 && index < 0) || index >= this.matrix.length) {
 			return null;
 		}
 		return new Recode(this.matrix[index]);
@@ -117,8 +115,7 @@ class Service {
 	}
 	hash(group, fileName) {
 		const result = this.accessor.findRow([group, fileName]);
-		const hash = result ? result.hash : null;
-		return hash;
+		return result ? result.hash : null;
 	}
 	save(group, fileName, data, hash) {
 		if (!group || !fileName || !data || !hash) {
@@ -176,7 +173,8 @@ class YadorigiWebRTCSignalingServer {
 	}
 	res(record, key) {
 		const output = ContentService.createTextOutput('');
-		output.append(record && record[key] && record[key] !== 0 ? record[key] : record + '');
+		const result = record && record[key] && record[key] !== 0 ? record[key] : record;
+		output.append(typeof result === 'string' || typeof result === 'number' || typeof result === 'bool' ? result : JSON.stringify(result));
 		output.setMimeType(ContentService.MimeType.TEXT);
 		return output;
 	}
