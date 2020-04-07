@@ -1,4 +1,7 @@
 node_modules/
+node_modules/*
+./node_modules/
+./node_modules/.bin
 build
 *.tgz
 template/src/__tests__/__snapshots__/
@@ -9,3 +12,4 @@ yarn-error.log*
 /.changelog
 .npm/
 dist/*
+node_modules

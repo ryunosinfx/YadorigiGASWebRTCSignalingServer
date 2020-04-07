@@ -14,6 +14,7 @@ class Test {
 		console.log(this.url);
 	}
 	async doTestExec(event, logger) {
+		const unixtime = Date.now();
 		const gropeNameLimit = 'grp' + c125;
 		const fileNameLimit = 'fil' + c125;
 		const fileNameLimit1 = 'fi1' + c125;
@@ -29,32 +30,55 @@ class Test {
 		await this.postLogA(logger, 'a', 'a', 'ax.a', 'aa', 'aaaa');
 		await this.postLogA(logger, 'a', 'a', 'aa1.a', 'aaa1', 'aa1aaaaaaaaaaaa');
 		await this.postLogA(logger, 'a', 'a', 'aa2.a', 'aaa2', 'aa2aaaaaaaaaaaa');
-		await this.getLogA(logger, 'get', 'a', 'aa2.a', '', '');
+		await this.getLogA(logger, 'get', 'a', 'aa2.a', 'aa2aaaaaaaaaaaa', '');
 		await this.postLogA(logger, 'a', 'a', 'aa3.a', 'aaa3', 'aa3aaaaaaaaaaaa');
-		await this.postLogA(logger, 'a', 'a', 'aa4.a', 'aaa4', 'aa3aaaaaaaaaaaa');
-		await this.postLogA(logger, 'a', 'a', 'aa5.a', 'aaa5', 'aa3aaaaaaaaaaaa');
-		await this.postLogA(logger, 'a', 'a', 'aa6.a', 'aaa6', 'aa3aaaaaaaaaaaa');
-		await this.postLogA(logger, 'a', 'a', 'aa7.a', 'aaa7', 'aa3aaaaaaaaaaaa');
-		await this.postLogA(logger, 'a', 'a', 'aa8.a', 'aaa8', 'aa3aaaaaaaaaaaa');
+		await this.postLogA(logger, 'a', 'a', 'aa4.a', 'aaa4', 'aa4aaaaaaaaaaaa');
+		await this.postLogA(logger, 'a', 'a', 'aa5.a', 'aaa5', 'aa5aaaaaaaaaaaa');
+		await this.postLogA(logger, 'a', 'a', 'aa6.a', 'aaa6', 'aa6aaaaaaaaaaaa');
+		await this.postLogA(logger, 'a', 'a', 'aa7.a', 'aaa7', 'aa7aaaaaaaaaaaa');
+		await this.postLogA(logger, 'a', 'a', 'aa8.a', 'aaa8', 'aa8aaaaaaaaaaaa');
 		await this.postLogA(logger, 'a', gropeNameLimit, fileNameLimit, hashLimit, dataLimit);
 		await this.postLogA(logger, 'a', gropeNameOrver, fileNameLimit1, hashLimit, dataLimit);
 		await this.postLogA(logger, 'a', gropeNameLimit, fileNameOrver, hashLimit, dataLimit);
 		await this.postLogA(logger, 'a', gropeNameLimit, fileNameLimit2, hashOrver, dataLimit);
 		await this.postLogA(logger, 'a', gropeNameLimit, fileNameLimit3, hashLimit, dataOrver);
-		await this.getLogA(logger, 'b', 'b', 'b', 'b', 'b');
-		await this.getLogA(logger, 'get', 'b', 'b', 'b', 'b');
-		await this.getLogA(logger, 'get', 'a', 'b', 'b', 'b');
-		await this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit, '', '');
-		await this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit1, '', '');
-		await this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit2, '', '');
-		await this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit3, '', '');
-		await this.getLogA(logger, 'get', 'a', 'aa3.a', '', '');
-		await this.getLogA(logger, 'get', 'a', 'aa2.a', '', '');
-		await this.getLogA(logger, 'get', 'a', 'aa4.a', '', '');
-		await this.getLogA(logger, 'last', gropeNameLimit, '', '', '');
-		await this.getLogA(logger, 'hash', gropeNameLimit, 'aa2.a', '', '');
-		await this.getLogA(logger, 'next', 'a', 'aa2.a', '', '');
-		await this.getLogA(logger, '', '', '', '', '');
+		this.getLogA(logger, 'b', 'b', 'b', 'null');
+		this.getLogA(logger, 'get', 'b', 'b', 'null');
+		this.getLogA(logger, 'get', 'a', 'b', 'null');
+		this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit, dataLimit);
+		this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit1, 'null');
+		this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit2, 'null');
+		this.getLogA(logger, 'get', gropeNameLimit, fileNameLimit3, 'null');
+		this.getLogA(logger, 'get', 'a', 'aa3.a', 'aa3aaaaaaaaaaaa');
+		this.getLogA(logger, 'get', 'a', 'aa2.a', 'aa2aaaaaaaaaaaa');
+		this.getLogA(logger, 'get', 'a', 'aa4.a', 'aa4aaaaaaaaaaaa');
+		this.getLogA(logger, 'last', gropeNameLimit, '', dataLimit);
+		this.getLogA(logger, 'hash', 'a', 'aa2.a', 'aaa2');
+		this.getLogA(logger, 'next', 'a', 'aa2.a', 'aa3aaaaaaaaaaaa');
+		console.log('-A-----');
+		this.currentLogger = logger;
+		this.oneGetUnitTest('a1a');
+		this.oneGetUnitTest('a2a');
+		this.oneGetUnitTest('a3a');
+		this.oneGetUnitTest('a4a');
+		this.oneGetUnitTest('a5a');
+		this.oneGetUnitTest('a6a');
+		this.oneGetUnitTest('a7a');
+		console.log('--B----');
+	}
+	async oneGetUnitTest(key, group = 'a') {
+		const waitTime = Math.ceil(Math.random() * 1000);
+		const current = Date.now();
+		const groupA = group + '/' + current;
+		const fileName = key + '/' + current + '.file';
+		const hash = key + '/' + current + '.hash';
+		const data = key + '/' + current + '/' + c125;
+		const logger = this.currentLogger;
+		await this.postLogA(logger, 'a', groupA, fileName, hash, data);
+		setTimeout(() => {
+			this.getLogA(logger, 'get', groupA, fileName, data);
+			this.getLogA(logger, 'hash', groupA, fileName, hash);
+		}, waitTime);
 	}
 	init() {
 		this.setEventListern('getButton');
@@ -130,12 +154,12 @@ class Test {
 		const result = await this.post(params);
 		return logger.add('POST req:' + JSON.stringify(params) + '\n/res:' + JSON.stringify(result));
 	}
-	async getLogA(logger, command, group, fileName, hash, dataString, expect) {
-		const params = this.createData(command, group, fileName, hash, dataString);
+	async getLogA(logger, command, group, fileName, expect) {
+		const params = this.createData(command, group, fileName);
 		const result = await this.get(params);
 		console.log('getLogA result:' + result + '/!!result:' + !!result + '/' + typeof result);
 		console.log(result);
-		const asert = expect ? result === expect : !!result;
+		const asert = expect ? result === expect : false;
 		return logger.add('GET req:' + JSON.stringify(params) + '\n/res:' + JSON.stringify(result) + '\n[' + asert + ']');
 	}
 	doTest(self, logger) {

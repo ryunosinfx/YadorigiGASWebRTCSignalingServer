@@ -44,11 +44,11 @@ class SheetAddressor {
 		this.matrix = this.sheet.getDataRange().getValues(); //受け取ったシートのデータを二次元配列に取得
 	}
 	getLastRow() {
-		const lastRowIndex = this.sheet.getDataRange().getLastRow(); //対象となるシートの最終行を取得
+		const lastRowIndex = this.sheet.getDataRange().getLastRow() * 1 - 1; //対象となるシートの最終行を取得
 		return new Recode(this.matrix[lastRowIndex]);
 	}
 	deleteRow(index) {
-		return this.sheet.deleteRows(index, 1);
+		return this.sheet.deleteRow(index);
 	}
 	findRow(where) {
 		// console.log('Service get where');
@@ -84,9 +84,10 @@ class SheetAddressor {
 		}
 		const scvlen = scavengableList.length;
 		for (let i = 0; i < scvlen; i++) {
-			const index = scavengableList.pop() + 1;
+			const index = scavengableList.shift() + 1;
 			// console.log('index:' + index + '/i:' + i);
 			this.deleteRow(index);
+			// break;
 		}
 		return resultRow ? new Recode(resultRow, resultRowIndex) : null;
 	}
@@ -107,7 +108,7 @@ class Service {
 	getNext(group, fileName) {
 		const result = this.accessor.findRow([group, fileName]);
 		const index = result ? result.index : null;
-		const targetIndex = index && typeof index === 'number' ? index - 1 : 0;
+		const targetIndex = index && typeof index === 'number' ? index - 1 : 1;
 		return this.accessor.getRowByIndex(targetIndex);
 	}
 	get(group, fileName) {
@@ -163,7 +164,7 @@ class YadorigiWebRTCSignalingServer {
 					console.log('Sorry, we are out of ' + command + '.');
 			}
 		}
-		return this.res('{msg:"no data!"}');
+		return this.res(null);
 	}
 	parse(event) {
 		if (!event || !event.parameter) {
