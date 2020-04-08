@@ -40,6 +40,7 @@ class SheetAddressor {
 	}
 	addRow(group, fileName, data, hash) {
 		const record = new Recode(group, fileName, data, hash);
+		this.findRow([], true);
 		this.sheet.appendRow(record.toArray());
 		this.matrix = this.sheet.getDataRange().getValues(); //受け取ったシートのデータを二次元配列に取得
 	}
@@ -50,7 +51,7 @@ class SheetAddressor {
 	deleteRow(index) {
 		return this.sheet.deleteRow(index);
 	}
-	findRow(where) {
+	findRow(where, isDelete) {
 		// console.log('Service get where');
 		// console.log(where);
 		const current = Date.now() - duration;
@@ -77,7 +78,7 @@ class SheetAddressor {
 				resultRowIndex = i;
 			}
 			const createTime = (row[4] + '') * 1;
-			if (!isNaN(createTime) && createTime < current) {
+			if (isDelete && !isNaN(createTime) && createTime < current) {
 				// console.log('createTime:' + createTime + '/i:' + i);
 				scavengableList.push(i);
 			}
@@ -125,10 +126,7 @@ class Service {
 		this.accessor.addRow(this.reap(group, 128), this.reap(fileName, 128), this.reap(data, 10240), this.reap(hash, 90));
 	}
 	reap(value, max) {
-		return (value + '')
-			.split(regex)
-			.join('')
-			.substring(0, max);
+		return (value + '').split(regex).join('').substring(0, max);
 	}
 }
 

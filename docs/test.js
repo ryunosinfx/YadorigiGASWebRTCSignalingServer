@@ -64,19 +64,39 @@ class Test {
 		this.oneGetUnitTest('a5a');
 		this.oneGetUnitTest('a6a');
 		this.oneGetUnitTest('a7a');
+		this.oneGetUnitTest('a8a');
+		this.oneGetUnitTest('a9a');
+		this.oneGetUnitTest('a10a');
+		this.oneGetUnitTest('a11a');
+		this.oneGetUnitTest('a12a');
+		this.oneGetUnitTest('a13a');
+		this.oneGetUnitTest('a14a');
+		this.oneGetUnitTest('a15a');
 		console.log('--B----');
 	}
 	async oneGetUnitTest(key, group = 'a') {
 		const waitTime = Math.ceil(Math.random() * 1000);
 		const current = Date.now();
-		const groupA = group + '/' + current;
-		const fileName = key + '/' + current + '.file';
-		const hash = key + '/' + current + '.hash';
-		const data = key + '/' + current + '/' + c125;
+		const groupA = group + '_' + current;
+		const fileName = key + '_' + current + '.file';
+		const hash = key + '_' + current + '.hash';
+		const data = key + '_' + current + '_' + c125;
 		const logger = this.currentLogger;
-		await this.postLogA(logger, 'a', groupA, fileName, hash, data);
-		setTimeout(() => {
-			this.getLogA(logger, 'get', groupA, fileName, data);
+		let count = 0;
+		while (count < 10) {
+			await this.postLogA(logger, 'a', groupA, fileName, hash, data);
+			await new Promise((resolve) => {
+				setTimeout(() => {
+					resolve();
+				}, waitTime);
+			});
+			count++;
+			const result = await this.getLogA(logger, 'get', groupA, fileName, data);
+			if (result === data) {
+				break;
+			}
+		}
+		setTimeout(async () => {
 			this.getLogA(logger, 'hash', groupA, fileName, hash);
 		}, waitTime);
 	}
@@ -106,7 +126,7 @@ class Test {
 		const ResultDom = result && result[0] ? result[0] : null;
 		const logger = new Logger(ResultDom);
 		const func = funcSeed ? funcSeed(this, logger) : null;
-		return async event => {
+		return async (event) => {
 			console.log(targetElm);
 			const params = {};
 			for (let k = 0; k < parent.children.length; k++) {
@@ -160,10 +180,11 @@ class Test {
 		console.log('getLogA result:' + result + '/!!result:' + !!result + '/' + typeof result);
 		console.log(result);
 		const asert = expect ? result === expect : false;
-		return logger.add('GET req:' + JSON.stringify(params) + '\n/res:' + JSON.stringify(result) + '\n[' + asert + ']');
+		logger.add('GET req:' + JSON.stringify(params) + '\n/res:' + JSON.stringify(result) + '\n[' + asert + ']');
+		return result;
 	}
 	doTest(self, logger) {
-		return event => {
+		return (event) => {
 			if (confirm('execute Test!' + event)) {
 				self.doTestExec(event, logger);
 			}
@@ -208,7 +229,7 @@ class UrlUtil {
 	static convertObjToQueryParam(data) {
 		if (data && typeof data === 'object') {
 			return Object.keys(data)
-				.map(key => key + '=' + encodeURIComponent(data[key]))
+				.map((key) => key + '=' + encodeURIComponent(data[key]))
 				.join('&');
 		}
 		return data;
@@ -239,8 +260,8 @@ class Fetcher {
 			redirect: 'follow',
 			referrer: 'no-referrer',
 			headers: {
-				'Content-Type': contentType
-			}
+				'Content-Type': contentType,
+			},
 		};
 		const isObj = typeof data === 'object';
 		if (isPost) {
