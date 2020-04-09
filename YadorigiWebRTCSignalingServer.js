@@ -10,10 +10,7 @@ class Recode {
 			this.createTime = group[4];
 			this.index = fileName;
 		} else if (!group) {
-			// console.warn('Recode group!!!!!!!!!!!!!!!!' + '/');
-			// console.warn(group);
 		} else if (group && typeof group === 'object') {
-			// console.warn('Recode group!!!!!!!!!!!!!!!!？？' + '/' + group.length);
 			this.group = group.group;
 			this.fileName = group.fileName;
 			this.data = group.data;
@@ -38,11 +35,25 @@ class SheetAddressor {
 		this.sheet = SpreadsheetApp.getActiveSpreadsheet();
 		this.matrix = this.sheet.getDataRange().getValues(); //受け取ったシートのデータを二次元配列に取得
 	}
-	addRow(group, fileName, data, hash) {
+	async addRow(group, fileName, data, hash) {
 		const record = new Recode(group, fileName, data, hash);
 		this.findRow([], true);
-		this.sheet.appendRow(record.toArray());
-		this.matrix = this.sheet.getDataRange().getValues(); //受け取ったシートのデータを二次元配列に取得
+		let count = 0;
+		const where = [group, fileName];
+		while (count < 100) {
+			this.sheet.appendRow(record.toArray());
+			this.matrix = this.sheet.getDataRange().getValues(); //受け取ったシートのデータを二次元配列に取得
+			const wwaitTime = Math.floor(Math.random() * 10) * 100;
+			await new Promise((resolve) => {
+				setTimeout(() => {
+					resolve();
+				}, wwaitTime);
+			});
+			if (this.findRow(where)) {
+				break;
+			}
+			count++;
+		}
 	}
 	getLastRow() {
 		const lastRowIndex = this.sheet.getDataRange().getLastRow() * 1 - 1; //対象となるシートの最終行を取得
@@ -52,8 +63,6 @@ class SheetAddressor {
 		return this.sheet.deleteRow(index);
 	}
 	findRow(where, isDelete) {
-		// console.log('Service get where');
-		// console.log(where);
 		const current = Date.now() - duration;
 		const len = this.matrix.length;
 		const whereCount = where.length;
@@ -68,25 +77,20 @@ class SheetAddressor {
 			for (let j = 0; j < colsCount; j++) {
 				const colValue = row[j];
 				const condition = where[j];
-				// console.log('SheetAddressor colValue:' + colValue + '/condition:' + condition + '/matchCount:' + matchCount + '/whereCount:' + whereCount + '/j:' + j);
 				matchCount += (whereCount > j && condition && condition === colValue) || (whereCount > j && !condition) ? 1 : 0;
 			}
 			if (matchCount === whereCount) {
-				console.log('SheetAddressor findRow row' + typeof row + '/' + Array.isArray(row));
-				console.log(row);
 				resultRow = row;
 				resultRowIndex = i;
 			}
 			const createTime = (row[4] + '') * 1;
 			if (isDelete && !isNaN(createTime) && createTime < current) {
-				// console.log('createTime:' + createTime + '/i:' + i);
 				scavengableList.push(i);
 			}
 		}
 		const scvlen = scavengableList.length;
 		for (let i = 0; i < scvlen; i++) {
 			const index = scavengableList.shift() + 1;
-			// console.log('index:' + index + '/i:' + i);
 			this.deleteRow(index);
 			// break;
 		}
