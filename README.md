@@ -8,7 +8,7 @@ https://script.google.com/macros/s/AKfycbyEIu-LGf6EuywyQnEq41Tf21tU0iB3DCDkPBygQ
 
 ### Test Page
 
-https://ryunosinfx.github.io/YadorigiGASWebRTCSignalingServer/
+https://ryunosinfx.github.io/YadorigiGASWebRTCSignalingServer/index.html
 
 ### Usage
 
